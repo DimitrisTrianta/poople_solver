@@ -2413,7 +2413,7 @@ static WORDS: [WordStep; 2398] = [
 ];
 
 /// checks if two words have only a single letter different
-fn check_one_letter_diff(word1: &str, word2: &str) -> bool{   // checks if two words have only a single letter difference
+fn check_one_letter_diff(word1: &str, word2: &str) -> bool{
     let mut count: i8 = 0;
     for (c1, c2) in word1.chars().zip(word2.chars()) {
         if c1 != c2{
@@ -2434,7 +2434,7 @@ fn find_valid_words<'a>(curr_word: &WordStep, words: &'a [WordStep]) -> Vec<&'a 
     return valid_words;
 }
 
-// keeps looking for the next step until it finds the goal, then returns the path it found
+/// keeps looking for the next step until it finds the goal, then returns the path it found
 fn solve_puzzle(starting_word: &'static WordStep) -> Vec<&'static WordStep> {
     let mut curr_word = starting_word;
     let mut path: Vec<&'static WordStep> = Vec::new();
@@ -2450,28 +2450,31 @@ fn solve_puzzle(starting_word: &'static WordStep) -> Vec<&'static WordStep> {
 }
 
 fn main(){
+    // create a hashmap of (word, index in list) pairs, for fast lookup in list
     let mut word_map: HashMap<&str, usize> = HashMap::with_capacity(WORDS.len());
         for (index, record) in WORDS.iter().enumerate() {
             word_map.insert(record.word, index);
         }
 
+    // print user input message, and flush the buffer
     print!("enter the starting word: ");
     io::stdout().flush().unwrap();
 
+    // get user input and clean it
     let mut user_input = String::new();
     io::stdin().read_line(&mut user_input).expect("Failed to read input");
     user_input = user_input.trim().to_lowercase();
-        
-    if let Some(&index) = word_map.get(user_input.as_str()){
+
+    if let Some(&index) = word_map.get(user_input.as_str()){ // convert user_input to string slice. if the get function finds the word in the hashmap solve the puzzle.
 
         let start_word = &WORDS[index];
 
         let best_path = solve_puzzle(&start_word);
 
-        for (i, step) in best_path.iter().enumerate(){
-            println!("Step {}: {}", i, step.word)
+        for (i, step) in best_path.iter().enumerate().skip(1){
+            println!("Step {}: {}", i , step.word)
         }
-    } else {
+    } else { // else print error message
         println!("Error: '{}' was not found in list", user_input)
     }
 
