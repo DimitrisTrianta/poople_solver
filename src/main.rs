@@ -1,16 +1,16 @@
 // GOAL OF THE PROGRAM: get to the word POOP from any given word from the array, in the least steps possible, while changing only one letter at a time
 
-use std::array;
+use std::collections::HashMap;
+use std::io::{self, Write};
 
-// structure that pairs each word with the minimum steps required to reach the goal
+/// pair of word and minimum steps to goal
 #[derive(Debug)]
 struct WordStep{
     word: &'static str,
     steps: i8,
 }
 
-
-// static array with words and minimum steps to goal
+/// static array of all WordSteps
 static WORDS: [WordStep; 2398] = [
     WordStep { word: "poop", steps: 0 },
     WordStep { word: "boop", steps: 1 },
@@ -2412,7 +2412,7 @@ static WORDS: [WordStep; 2398] = [
     WordStep { word: "augh", steps: 11 },
 ];
 
-// checks if two words have only a single letter different
+/// checks if two words have only a single letter different
 fn check_one_letter_diff(word1: &str, word2: &str) -> bool{   // checks if two words have only a single letter difference
     let mut count: i8 = 0;
     for (c1, c2) in word1.chars().zip(word2.chars()) {
@@ -2424,7 +2424,7 @@ fn check_one_letter_diff(word1: &str, word2: &str) -> bool{   // checks if two w
     return count == 1;
 }
 
-// returns a vector with all the valid and efficient words possible for the next step
+/// returns a vector with all the valid and efficient words possible for the next step
 fn find_valid_words<'a>(curr_word: &WordStep, words: &'a [WordStep]) -> Vec<&'a WordStep>{
     let valid_words: Vec<&'a WordStep> = words
         .iter()
@@ -2450,10 +2450,29 @@ fn solve_puzzle(starting_word: &'static WordStep) -> Vec<&'static WordStep> {
 }
 
 fn main(){
-    let starting_word: &WordStep = &WORDS[2392];
+    let mut word_map: HashMap<&str, usize> = HashMap::with_capacity(WORDS.len());
+        for (index, record) in WORDS.iter().enumerate() {
+            word_map.insert(record.word, index);
+        }
 
-    let best_path = solve_puzzle(starting_word);
+    print!("enter the starting word: ");
+    io::stdout().flush().unwrap();
 
-    println!("{:#?}", best_path)
+    let mut user_input = String::new();
+    io::stdin().read_line(&mut user_input).expect("Failed to read input");
+    user_input = user_input.trim().to_lowercase();
+        
+    if let Some(&index) = word_map.get(user_input.as_str()){
+
+        let start_word = &WORDS[index];
+
+        let best_path = solve_puzzle(&start_word);
+
+        for (i, step) in best_path.iter().enumerate(){
+            println!("Step {}: {}", i, step.word)
+        }
+    } else {
+        println!("Error: '{}' was not found in list", user_input)
+    }
 
 }
