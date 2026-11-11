@@ -1,17 +1,15 @@
 // GOAL OF THE PROGRAM: get to the word POOP from any given word from the array, in the least steps possible, while changing only one letter at a time
-
-use std::collections::HashMap;
-use std::io::{self, Write};
+use wasm_bindgen::prelude::*;
 
 /// pair of word and minimum steps to goal
 #[derive(Debug)]
-struct WordStep{
+pub struct WordStep{
     word: &'static str,
     steps: i8,
 }
 
-/// static array of all WordSteps
-static WORDS: [WordStep; 2398] = [
+/// constant array of all WordSteps
+const WORDS: [WordStep; 2398] = [
     WordStep { word: "poop", steps: 0 },
     WordStep { word: "boop", steps: 1 },
     WordStep { word: "coop", steps: 1 },
@@ -2435,7 +2433,7 @@ fn find_valid_words<'a>(curr_word: &WordStep, words: &'a [WordStep]) -> Vec<&'a 
 }
 
 /// keeps looking for the next step until it finds the goal, then returns the path it found
-fn solve_puzzle(starting_word: &'static WordStep) -> Vec<&'static WordStep> {
+pub fn find_quickest_path(starting_word: &'static WordStep) -> Vec<String> {
     let mut curr_word = starting_word;
     let mut path: Vec<&'static WordStep> = Vec::new();
     path.push(curr_word);
@@ -2445,37 +2443,8 @@ fn solve_puzzle(starting_word: &'static WordStep) -> Vec<&'static WordStep> {
         path.push(next_word);
         curr_word = next_word;
     }
+
+    let final_path = path.iter().map(|ws| ws.word.to_string()).collect::<Vec<String>>();
     
-    return path;
-}
-
-fn main(){
-    // create a hashmap of (word, index in list) pairs, for fast lookup in list
-    let mut word_map: HashMap<&str, usize> = HashMap::with_capacity(WORDS.len());
-        for (index, record) in WORDS.iter().enumerate() {
-            word_map.insert(record.word, index);
-        }
-
-    // print user input message, and flush the buffer
-    print!("enter the starting word: ");
-    io::stdout().flush().unwrap();
-
-    // get user input and clean it
-    let mut user_input = String::new();
-    io::stdin().read_line(&mut user_input).expect("Failed to read input");
-    user_input = user_input.trim().to_lowercase();
-
-    if let Some(&index) = word_map.get(user_input.as_str()){ // convert user_input to string slice. if the get function finds the word in the hashmap solve the puzzle.
-
-        let start_word = &WORDS[index];
-
-        let best_path = solve_puzzle(&start_word);
-
-        for (i, step) in best_path.iter().enumerate().skip(1){
-            println!("Step {}: {}", i , step.word)
-        }
-    } else { // else print error message
-        println!("Error: '{}' was not found in list", user_input)
-    }
-
+    return final_path;
 }

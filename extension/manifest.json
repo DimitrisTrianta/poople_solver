@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Poople Solver",
+  "version": "1.0",
+  "description": "Scrapes the board and solves the puzzle using WASM.",
+  "content_scripts": [
+    {
+      "matches": ["https://poople.io"], 
+      "js": ["scraper.js"]
+    }
+  ]
+}
