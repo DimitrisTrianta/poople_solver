@@ -1,3 +1,5 @@
+use std::{collections::HashMap, sync::OnceLock};
+
 // GOAL OF THE PROGRAM: get to the word POOP from any given word from the array, in the least steps possible, while changing only one letter at a time
 use wasm_bindgen::prelude::*;
 
@@ -2410,6 +2412,20 @@ const WORDS: [WordStep; 2398] = [
     WordStep { word: "augh", steps: 11 },
 ];
 
+/// constant hashmap that maps all words to their index in the array
+static WORD_MAP: OnceLock<HashMap<&'static str, usize>> = OnceLock::new();
+
+/// Helper function to initialize the hashmap once and return a reference
+fn get_word_map() -> &'static HashMap<&'static str, usize> {
+    WORD_MAP.get_or_init(|| {
+        let mut map = HashMap::with_capacity(WORDS.len());
+        for (index, record) in WORDS.iter().enumerate() {
+            map.insert(record.word, index);
+        }
+        return map
+    })
+}
+
 /// checks if two words have only a single letter different
 fn check_one_letter_diff(word1: &str, word2: &str) -> bool{
     let mut count: i8 = 0;
@@ -2433,8 +2449,10 @@ fn find_valid_words<'a>(curr_word: &WordStep, words: &'a [WordStep]) -> Vec<&'a 
 }
 
 /// keeps looking for the next step until it finds the goal, then returns the path it found
-pub fn find_quickest_path(starting_word: &'static WordStep) -> Vec<String> {
-    let mut curr_word = starting_word;
+#[wasm_bindgen]
+pub fn find_quickest_path(starting_word: String) -> Vec<String> {
+    let map = get_word_map();
+    let curr_word: &'static WordStep = &WORDS[*map.get(starting_word.as_str()).unwrap()];
     let mut path: Vec<&'static WordStep> = Vec::new();
     path.push(curr_word);
     
