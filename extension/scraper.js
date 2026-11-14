@@ -1,10 +1,13 @@
+// init the variables for the path and the wasm module
 let wasmModule = null;
 let precalculatedPath = null;
 
+// gets the last inputted word of the game
 function getStartingWord() {
   const scroll_container = document.getElementById("ScrollContainer");
-  const first_row = scroll_container.querySelector(".Row");
-  const starting_letters = first_row.querySelectorAll(".Box")
+  const rows = scroll_container.querySelectorAll(".Row");
+  const target_row = rows[rows.length - 2];
+  const starting_letters = target_row.querySelectorAll(".Box");
 
   if (starting_letters.length !== 4) {
     console.log("Error: Starting word not found")
@@ -32,14 +35,6 @@ function getStartingWord() {
     await loadedModule.default(wasmFileUrl);
     wasmModule = loadedModule;
     console.log("Wasm solver loaded."); // Breadcrumb
-
-    // Scrape the word from the interface
-    const startingWord = getStartingWord()
-
-    // Call Rust function
-    if (startingWord) {
-      precalculatedPath = wasmModule.find_quickest_path(startingWord);
-    }
 
   } catch (error) {
     console.error("Error loading Wasm or solving:", error);
@@ -72,13 +67,36 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.command === "run_solve") {
     sendResponse({ success: true }); 
     
+
+    // find current word and calculate the quickest path
+    const currentWord = getStartingWord()
+    if (currentWord && currentWord != "") {
+      precalculatedPath = wasmModule.find_quickest_path(currentWord)
+    }
     // Do the typing locally
     if (precalculatedPath && precalculatedPath.length > 0) {
       (async () => {
+        
         for (let i = 1; i < precalculatedPath.length; i++) {
           await typeWord(precalculatedPath[i]);
           await sleep(500);
         }
+      })();
+    }
+  }
+
+  if (request.command === "run_next") {
+    sendResponse({ success: true }); 
+
+    // find current word and calculate the quickest path
+    const currentWord = getStartingWord()
+    if (currentWord && currentWord != "") {
+      precalculatedPath = wasmModule.find_quickest_path(currentWord)
+    }
+    // Do the typing locally
+    if (precalculatedPath && precalculatedPath.length > 0) {
+      (async () => {
+        typeWord(precalculatedPath[1])
       })();
     }
   }

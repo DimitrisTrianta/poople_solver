@@ -2452,10 +2452,13 @@ fn find_valid_words<'a>(curr_word: &WordStep, words: &'a [WordStep]) -> Vec<&'a 
 #[wasm_bindgen]
 pub fn find_quickest_path(starting_word: String) -> Vec<String> {
     let map = get_word_map();
-    let curr_word: &'static WordStep = &WORDS[*map.get(starting_word.as_str()).unwrap()];
+    let Some(&index) = map.get(starting_word.as_str()) else {
+            return Vec::new(); // Returns an empty array to JS if the scraped word is invalid
+        };
+    let mut curr_word: &'static WordStep = &WORDS[index];
     let mut path: Vec<&'static WordStep> = Vec::new();
     path.push(curr_word);
-    
+
     while curr_word.word != "poop" {
         let next_word = find_valid_words(curr_word, &WORDS)[0];
         path.push(next_word);

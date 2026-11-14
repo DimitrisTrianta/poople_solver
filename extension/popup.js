@@ -1,35 +1,19 @@
-document.getElementById("solveBtn").addEventListener("click", async () => {
-  // Find the active tab the user is looking at
+async function sendCommand(commandName) {
+  console.log("Executing...");
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-  // Send the "run_solve" command to scraper.js
-  chrome.tabs.sendMessage(tab.id, { command: "run_solve" }, (response) => {
+  chrome.tabs.sendMessage(tab.id, { command: commandName }, (response) => {
     if (chrome.runtime.lastError) {
-      document.getElementById("result").innerText = "Error: Refresh the page.";
+      console.error("Error: Refresh the page.");
       return;
     }
-    if (response && response.path && response.path.length > 0) {
-      document.getElementById("result").innerText = response.path.join(" ");
-    } else {
-      document.getElementById("result").innerText = "Word not found.";
+    if (response && response.success) {
+      console.log("Task completed");
+    } else if (response && response.error) {
+      console.error(response.error);
     }
   });
-});
+}
 
-document.getElementById("nextWord").addEventListener("click", async () => {
-  // Find the active tab the user is looking at
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
-  // Send the "run_solve" command to scraper.js
-  chrome.tabs.sendMessage(tab.id, { command: "run_solve" }, (response) => {
-    if (chrome.runtime.lastError) {
-      document.getElementById("result").innerText = "Error: Refresh the page.";
-      return;
-    }
-    if (response && response.path && response.path.length > 0) {
-      
-    } else {
-      
-    }
-  });
-});
+document.getElementById("solveBtn").addEventListener("click", () => sendCommand("run_solve"));
+document.getElementById("nextWordBtn").addEventListener("click", () => sendCommand("run_next"));
