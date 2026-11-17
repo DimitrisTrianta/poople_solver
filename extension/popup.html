@@ -66,6 +66,15 @@
             button:hover {
                 background-color: var(--btn-hover);
             }
+            
+            .error-msg {
+                color: #ff6b6b;
+                font-size: 13px;
+                margin-top: 15px;
+                margin-bottom: 0;
+                font-weight: bold;
+                min-height: 15px; /* Prevents the window from resizing/jumping */
+            }
         </style>
     </head>
     <body>
@@ -81,6 +90,7 @@
             <button id="solveBtn">Solve All</button>
             <button id="nextWordBtn">Next Word</button>
         </div>
+        <p id="errorMsg" class="error-msg"></p>
         <script src="popup.js"></script>
     </body>
 </html>

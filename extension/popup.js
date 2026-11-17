@@ -1,4 +1,7 @@
 async function sendCommand(commandName) {
+  const errorElement = document.getElementById("errorMsg");
+  errorElement.textContent = "";
+  
   console.log("Executing...");
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
@@ -10,7 +13,7 @@ async function sendCommand(commandName) {
     if (response && response.success) {
       console.log("Task completed");
     } else if (response && response.error) {
-      console.error(response.error);
+      errorElement.textContent = response.error;
     }
   });
 }
