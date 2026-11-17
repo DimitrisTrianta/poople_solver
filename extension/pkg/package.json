@@ -1,0 +1,15 @@
+{
+  "name": "poople_solver",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "poople_solver_bg.wasm",
+    "poople_solver.js",
+    "poople_solver.d.ts"
+  ],
+  "main": "poople_solver.js",
+  "types": "poople_solver.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
